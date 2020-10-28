@@ -1,0 +1,93 @@
+<!doctype html>
+<html>
+
+<head lang="en">
+    <meta charset="utf-8">
+    <title>Ajax File Upload with jQuery and PHP</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+
+            <div class="col-md-8">
+
+                <h1><img src="srcImage/upload.jpeg" width="80px" />Ajax File uploading</a></h1>
+                <hr>
+
+                <!-- form starts here  -->
+                <form id="submitForm" action="ajaxUpload.php" method="post" enctype="multipart/form-data">
+
+                    <!-- uploadimage value null after upload  -->
+                    <input id="uploadImage" type="file" name="image" />
+                    <span class="help-block">Allowed file Type - jpg, jpeg, png, gif</span>
+
+                    <input class="btn btn-success" name="uploadBtn" id="uploadBtn" type="submit" value="Upload">
+                </form>
+                </br>
+                <div id="preview">
+                    <div class="card">
+                        <div class="card-header bg-success md-5"> Image Preview </div>
+                        <div id="imagePreview"></div>
+                    </div>
+                    <img id="logo" src="srcImage/upload.png" width="90px" height="90px" />
+                </div>
+                <br>
+                <div id="err"></div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+
+        // getting values from form and sending to ajaxUpload.php 
+        $('#submitForm').on('submit', function(e) {
+            e.preventDefault();
+            let formData = new FormData(this);
+
+            $.ajax({
+                url: 'ajaxUpload.php',
+                type: 'POST',
+                data: formData,       //all data passed wihout using object
+                contentType: false,   //multipart/form-data  or false (same meaning)
+                processData: false,
+                success: function(data) {
+                    debugger
+                    $('#logo').hide();
+                    $('#imagePreview').html(data);  //data uploaded for view
+                    $('#uploadImage').val('');      //value null after success
+                }
+            });
+        });
+
+        // deleting image after upload 
+        $(document).on('click','#dltBtn',function(){
+            if(confirm("Sure want to delete image?")){
+
+                //getting path from delete btn and sending to delete.php
+                let path = $('#dltBtn').data("path");
+
+                $.ajax({
+                    type:"POST",
+                    url:'delete.php',
+                    data:{path:path},
+                    success:function(data){
+                        debugger
+                        if(data!=''){
+                            $('#imagePreview').html(''); //data blank
+                        }
+                    }
+                })
+            }
+        });
+    })
+</script>
+
+</html>
+
+
+
